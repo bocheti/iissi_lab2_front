@@ -6,17 +6,26 @@ import ImageCard from '../../components/ImageCard'
 import TextRegular from '../../components/TextRegular'
 import TextSemiBold from '../../components/TextSemibold'
 import * as GlobalStyles from '../../styles/GlobalStyles'
+import { showMessage } from 'react-native-flash-message'
 
 export default function RestaurantDetailScreen ({ route }) {
   const [restaurant, setRestaurant] = useState({})
 
   useEffect(() => {
-    console.log('Loading restaurant details, please wait 1 second')
-    setTimeout(() => {
-      setRestaurant(getDetail(route.params.id))
-      console.log('Restaurant details loaded')
-    }, 1000)
-  }, [])
+    async function fetchedDetail () { // Addresses problem 1
+      try {
+        const fetchedDetail = await getDetail(route.params.id)
+        setRestaurant(fetchedDetail)
+      } catch (error) { // Addresses problem 3
+        showMessage({
+          message: `There was an error while retrieving restaurants. ${error} `,
+          type: 'error',
+          style: GlobalStyles.flashStyle,
+          titleStyle: GlobalStyles.flashTextStyle
+        })
+      }
+    } fetchedDetail()
+  }, []) // Addresses problem 2
 
   const renderHeader = () => {
     return (
